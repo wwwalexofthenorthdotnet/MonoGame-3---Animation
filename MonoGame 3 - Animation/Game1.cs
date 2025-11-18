@@ -41,7 +41,6 @@ namespace MonoGame_3___Animation
         int tribbleGreyY;
         int tribbleOrangeX;
         int tribbleOrangeY;
-        int tribbleBrownSize = 100;
 
         List<Color> BGColors = new List<Color> { Color.Black, Color.Green, Color.Coral, Color.Orange, Color.AliceBlue };
         
@@ -71,6 +70,7 @@ namespace MonoGame_3___Animation
             _graphics.PreferredBackBufferWidth = window.Width;
             _graphics.PreferredBackBufferHeight = window.Height;
             _graphics.ApplyChanges();
+          
 
             tribbleBrownX = generator.Next(window.Width - 100);
             tribbleBrownY = generator.Next(window.Height - 100);
@@ -81,9 +81,10 @@ namespace MonoGame_3___Animation
             tribbleOrangeX = generator.Next(window.Width - 100);
             tribbleOrangeY = generator.Next(window.Height - 100);
 
+
             quit = new Rectangle(0, 0, 200, 50);
 
-            tribbleBrown = new Rectangle(tribbleBrownX, tribbleBrownY, tribbleBrownSize, tribbleBrownSize);
+            tribbleBrown = new Rectangle(tribbleBrownX, tribbleBrownY, 100, 100);
             tribbleBrownSpeed = new Vector2(2, 1);
 
             tribbleCream = new Rectangle(tribbleCreamX, tribbleCreamY, 100, 100);
@@ -130,14 +131,30 @@ namespace MonoGame_3___Animation
             tribbleBrown.X += (int)tribbleBrownSpeed.X;
             tribbleBrown.Y += (int)tribbleBrownSpeed.Y;
 
-            if (tribbleBrown.Right > window.Width || tribbleBrown.Left < 0)
+            if (tribbleBrown.Left < 0)
             {
+                tribbleBrownSpeed.X -= 1;
                 tribbleBrownSpeed.X *= -1;
             }
-
-            if (tribbleBrown.Bottom > window.Height || tribbleBrown.Top < 0)
+        
+            if (tribbleBrown.Right > window.Width)
             {
+                tribbleBrownSpeed.X += 1;
+                tribbleBrownSpeed.X *= -1;
+
+            }
+
+            if (tribbleBrown.Top < 0)
+            {
+                tribbleBrownSpeed.Y -= 1;
                 tribbleBrownSpeed.Y *= -1;
+            }
+
+            if (tribbleBrown.Bottom > window.Height)
+            {
+                tribbleBrownSpeed.Y += 1;
+                tribbleBrownSpeed.Y *= -1;
+
             }
 
             tribbleCream.X += (int)tribbleCreamSpeed.X;
@@ -145,10 +162,14 @@ namespace MonoGame_3___Animation
 
 
             if (tribbleCream.Right > window.Width || tribbleCream.Left < 0)
+            {
                 tribbleCreamSpeed.X *= -1;
+            }
 
             if (tribbleCream.Bottom > window.Height || tribbleCream.Top < 0)
+            {
                 tribbleCreamSpeed.Y *= -1;
+            }
 
             tribbleGrey.X += (int)tribbleGreySpeed.X;
             tribbleGrey.Y += (int)tribbleGreySpeed.Y;
