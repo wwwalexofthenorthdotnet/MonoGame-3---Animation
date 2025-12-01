@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace MonoGame_3___Animation
 {
@@ -13,13 +14,26 @@ namespace MonoGame_3___Animation
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        enum Screen
+        {
+            Intro,
+            TribbleYard,
+            End
+        }
+
+        Screen screen;
+
         Rectangle window;
+
+        SpriteFont titleFont;
+        SpriteFont subTitleFont;
 
         Texture2D tribbleBrownTexture;
         Texture2D tribbleCreamTexture;
         Texture2D tribbleGreyTexture;
         Texture2D tribbleOrangeTexture;
         Texture2D quitTexture;
+        Texture2D tribbleIntroTexture;
 
         Rectangle tribbleBrown;
         Rectangle tribbleCream;
@@ -71,6 +85,7 @@ namespace MonoGame_3___Animation
             _graphics.PreferredBackBufferHeight = window.Height;
             _graphics.ApplyChanges();
           
+            screen = Screen.Intro;
 
             tribbleBrownX = generator.Next(window.Width - 100);
             tribbleBrownY = generator.Next(window.Height - 100);
@@ -110,22 +125,79 @@ namespace MonoGame_3___Animation
             tribbleGreyTexture = Content.Load<Texture2D>("tribbleGrey");
             tribbleOrangeTexture = Content.Load<Texture2D>("tribbleOrange");
             quitTexture = Content.Load<Texture2D>("quit");
+            tribbleIntroTexture = Content.Load<Texture2D>("TribbleIntro");
+            titleFont = Content.Load<SpriteFont>("Title");
+            subTitleFont = Content.Load<SpriteFont>("SubTitle");
+
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
+          
             // TODO: Add your update logic here
             
             prevMouseState = mouseState;
             mouseState = Mouse.GetState();
 
+            if (screen == Screen.Intro)
+            {
+                UpdateIntro();
+            }
+            if (screen == Screen.TribbleYard)
+            {
+                UpdateTribbleYard();
+            }
+            if (screen == Screen.End)
+            {
+                UpdateEnd();
+            }
+
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+
+            GraphicsDevice.Clear(BGColors[randomColor]);
+            
+
+                // TODO: Add your drawing code here
+
+                _spriteBatch.Begin();
+            if (screen == Screen.Intro)
+            {
+                _spriteBatch.Draw(tribbleIntroTexture, new Rectangle(0, 0, window.Width, window.Height), Color.White);
+                _spriteBatch.DrawString(titleFont, "Tribble Yard", new Vector2(100, 200), Color.White);
+                _spriteBatch.DrawString(subTitleFont, "Click to Start", new Vector2(250, 300), Color.White);
+
+            }
+            if (screen == Screen.TribbleYard)
+            {
+                _spriteBatch.Draw(tribbleBrownTexture, tribbleBrown, Color.White);
+                _spriteBatch.Draw(tribbleCreamTexture, tribbleCream, Color.White);
+                _spriteBatch.Draw(tribbleGreyTexture, tribbleGrey, Color.White);
+                _spriteBatch.Draw(tribbleOrangeTexture, tribbleOrange, Color.White);
+                _spriteBatch.Draw(quitTexture, quit, Color.White);
+            }
+            if (screen == Screen.End)
+            {
+                _spriteBatch.DrawString(subTitleFont, "Thank You for Playing", new Vector2(150, 200), Color.White);            }
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+
+        }
+        public void UpdateIntro()
+        {
+            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+                screen = Screen.TribbleYard;
+        }
+        public void UpdateTribbleYard()
+        {
             if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
             {
                 if (quit.Contains(mouseState.Position))
-                Exit();
+                    screen = Screen.End;
             }
 
             tribbleBrown.X += (int)tribbleBrownSpeed.X;
@@ -136,7 +208,7 @@ namespace MonoGame_3___Animation
                 tribbleBrownSpeed.X -= 1;
                 tribbleBrownSpeed.X *= -1;
             }
-        
+
             if (tribbleBrown.Right > window.Width)
             {
                 tribbleBrownSpeed.X += 1;
@@ -199,31 +271,14 @@ namespace MonoGame_3___Animation
 
             if (tribbleOrange.Bottom > window.Height || tribbleOrange.Top < 0)
                 tribbleOrangeSpeed.Y *= -1;
-
-            base.Update(gameTime);
         }
-
-        protected override void Draw(GameTime gameTime)
+        public void UpdateEnd()
         {
-
-            GraphicsDevice.Clear(BGColors[randomColor]);
-            
-
-                // TODO: Add your drawing code here
-
-                _spriteBatch.Begin();
-
-
-            _spriteBatch.Draw(tribbleBrownTexture, tribbleBrown, Color.White);
-            _spriteBatch.Draw(tribbleCreamTexture, tribbleCream, Color.White);
-            _spriteBatch.Draw(tribbleGreyTexture, tribbleGrey, Color.White);
-            _spriteBatch.Draw(tribbleOrangeTexture, tribbleOrange, Color.White);
-            _spriteBatch.Draw(quitTexture, quit, Color.White);
-
-            _spriteBatch.End();
-
-            base.Draw(gameTime);
-
+            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+            {
+                
+            }
         }
+
     }
 }
