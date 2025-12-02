@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
@@ -55,8 +56,9 @@ namespace MonoGame_3___Animation
         int tribbleGreyY;
         int tribbleOrangeX;
         int tribbleOrangeY;
+        float seconds;
 
-        List<Color> BGColors = new List<Color> { Color.Black, Color.Green, Color.Coral, Color.Orange, Color.AliceBlue };
+        List<Color> BGColors = new List<Color> { Color.DarkRed,  Color.Black, Color.Green, Color.Coral, Color.Orange, Color.AliceBlue };
         
 
         Random generator = new Random();
@@ -86,6 +88,7 @@ namespace MonoGame_3___Animation
             _graphics.ApplyChanges();
           
             screen = Screen.Intro;
+            seconds = 10;
 
             tribbleBrownX = generator.Next(window.Width - 100);
             tribbleBrownY = generator.Next(window.Height - 100);
@@ -139,6 +142,12 @@ namespace MonoGame_3___Animation
             prevMouseState = mouseState;
             mouseState = Mouse.GetState();
 
+
+            base.Update(gameTime);
+
+            seconds -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+
             if (screen == Screen.Intro)
             {
                 UpdateIntro();
@@ -181,7 +190,10 @@ namespace MonoGame_3___Animation
             }
             if (screen == Screen.End)
             {
-                _spriteBatch.DrawString(subTitleFont, "Thank You for Playing", new Vector2(150, 200), Color.White);            }
+                _spriteBatch.DrawString(subTitleFont, "Thank You for Playing", new Vector2(150, 200), Color.White); 
+                _spriteBatch.DrawString(subTitleFont, "Click to Exit", new Vector2(250, 250), Color.White);
+
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -250,7 +262,7 @@ namespace MonoGame_3___Animation
             {
                 tribbleGreySpeed.X *= -1;
                 randomColor = generator.Next(BGColors.Count);
-                if (randomColor == randomColor)
+                if (randomColor == BGColors.Count)
                     randomColor = generator.Next(BGColors.Count);
             }
 
@@ -274,9 +286,12 @@ namespace MonoGame_3___Animation
         }
         public void UpdateEnd()
         {
+            randomColor = 0;
+
             if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
             {
-                
+                if (!quit.Contains(mouseState.Position))
+                    Exit();
             }
         }
 
